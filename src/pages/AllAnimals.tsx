@@ -1,17 +1,23 @@
-import { IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonMenuButton, IonPage, IonTitle, IonToolbar, useIonViewWillEnter } from '@ionic/react';
 import { useParams } from 'react-router';
 import animalsJSON from "../data/animals.json"
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 
 const AllAnimals = () => {
 
   const { name } = useParams<{ name: string; }>();
 
-  const [animals, setAnimals] = useState<string[]>(animalsJSON)
+  const [animals, setAnimals] = useState<string[]>([])
 
-  useEffect(() => {
-    localStorage.setItem("animals", JSON.stringify(animalsJSON))
-  }, []);
+  useIonViewWillEnter(() => {
+    const stored = localStorage.getItem("animals")
+    if (stored) {
+      setAnimals(JSON.parse(stored))
+    } else {
+      localStorage.setItem("animals", JSON.stringify(animalsJSON))
+      setAnimals(animalsJSON)
+    }
+  })
 
   return (
     <IonPage>
@@ -26,8 +32,8 @@ const AllAnimals = () => {
 
       <IonContent color="light">
       <IonList inset={true}>
-        {animals.map(animal=>
-        <IonItem key={animal}>
+        {animals.map((animal, index)=>
+        <IonItem key={index}>
           <IonLabel>{animal}</IonLabel>
         </IonItem>
         )}
